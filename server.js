@@ -11,7 +11,7 @@ const app=express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/voter", require("./routes/voter"));
+app.use("/api/user", require("./routes/voter"));
 
 app.use("/api/candidate", require("./routes/candidates"));
 

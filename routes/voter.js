@@ -3,9 +3,6 @@ const { register, login } = require('../controllers/votercontroller');
 const router =express.Router();
 
 
-
-
-
 router.post("/register",register);
 router.post("/login",login);
 
