@@ -121,14 +121,6 @@ npm start
 
 ---
 
-## 🤝 Contributing
-
-```bash
-git clone https://github.com/your-username/voting-system.git
-```
-
----
-
 ## 📄 License
 
 MIT © [Kishan M C]
