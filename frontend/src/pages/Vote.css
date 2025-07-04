@@ -1,0 +1,75 @@
+.vote-container {
+  min-height: 100vh;
+  background: linear-gradient(to right, #ffecd2, #fcb69f);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+}
+
+.vote-container h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.vote-container p {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.vote-container button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.vote-container button:hover {
+  background-color: #218838;
+}
+
+.vote-message {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #00695c;
+  background-color: #e0f2f1;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #009688;
+  max-width: 400px;
+}
+
+.vote-loading {
+  font-size: 1.2rem;
+  color: #555;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+@media screen and (max-width: 600px) {
+  .vote-container {
+    padding: 1rem;
+  }
+
+  .vote-container h2 {
+    font-size: 1.6rem;
+  }
+
+  .vote-container button {
+    width: 100%;
+  }
+
+  .vote-message {
+    font-size: 0.95rem;
+    padding: 0.6rem;
+  }
+}
