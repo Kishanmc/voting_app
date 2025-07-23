@@ -1,3 +1,4 @@
+// candidateController.js
 const Candidate = require("../models/candidatemodel");
 const User = require("../models/votermodel");
 
@@ -55,11 +56,25 @@ exports.addCandidate = async (req, res) => {
   res.json({ message: "Candidate added", candidate });
 };
 
-// Get all candidates
+// ✅ Updated: Get all candidates with pagination
 exports.getAllCandidates = async (req, res) => {
   try {
-    const candidates = await Candidate.find().select("candidateId name party votes");
-    res.json(candidates);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const skip = (page - 1) * limit;
+
+    const total = await Candidate.countDocuments();
+    const candidates = await Candidate.find()
+      .select("candidateId name party votes")
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalCandidates: total,
+      candidates,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching candidates" });
   }

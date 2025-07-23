@@ -4,28 +4,19 @@ const Voter = require("../models/votermodel");
 const jwt = require("jsonwebtoken");
 
 
-const register = asyncHandler(async (req, res) => {
+exports.register = asyncHandler(async (req, res) => {
   const { user, password, role, voterid, adminid, name, email, phone, dob, gender, address } = req.body;
 
   if (!user || !password || !role || !name || !name.first) {
     return res.status(400).json({ error: "Required fields are missing" });
   }
 
-  // For voters
-  if (role === "voter") {
-    if (!voterid) return res.status(400).json({ error: "Voter ID is required" });
+  const idField = role === 'voter' ? 'voterid' : 'adminid';
+  const userId = role === 'voter' ? voterid : adminid;
+  if (!userId) return res.status(400).json({ error: `${role} ID is required` });
 
-    const existingVoter = await Voter.findOne({ voterid });
-    if (existingVoter) return res.status(400).json({ error: "Voter ID already in use" });
-  }
-
-  // For admins
-  if (role === "admin") {
-    if (!adminid) return res.status(400).json({ error: "Admin ID is required" });
-
-    const existingAdmin = await Voter.findOne({ adminid });
-    if (existingAdmin) return res.status(400).json({ error: "Admin ID already in use" });
-  }
+  const existing = await Voter.findOne({ [idField]: userId });
+  if (existing) return res.status(400).json({ error: `${role} ID already in use` });
 
   const hashed = await bcrypt.hash(password, 10);
 
@@ -44,29 +35,24 @@ const register = asyncHandler(async (req, res) => {
   });
 
   res.status(201).json({
-    message: `${role === "admin" ? "Admin" : "Voter"} registered successfully`,
+    message: `${role} registered successfully`,
     user: {
       username: voter.username,
       role: voter.role,
-      id: role === "voter" ? voter.voterid : voter.adminid
+      id: userId
     }
   });
 });
 
-// 🔐 Login
-const login = asyncHandler(async (req, res) => {
+exports.login = asyncHandler(async (req, res) => {
   const { user, password, role } = req.body;
 
-  let user_details;
-  if (role === "admin") {
-    user_details = await Voter.findOne({ adminid: user, role: "admin" });
-    if (!user_details) return res.status(400).json({ error: "Admin not found" });
-  } else if (role === "voter") {
-    user_details = await Voter.findOne({ voterid: user, role: "voter" });
-    if (!user_details) return res.status(400).json({ error: "Voter not found" });
-  } else {
-    return res.status(400).json({ error: "Invalid role" });
-  }
+  const criteria = role === "admin"
+    ? { adminid: user, role: "admin" }
+    : { voterid: user, role: "voter" };
+
+  const user_details = await Voter.findOne(criteria);
+  if (!user_details) return res.status(400).json({ error: `${role} not found` });
 
   const isMatch = await bcrypt.compare(password, user_details.password);
   if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
@@ -94,8 +80,3 @@ const login = asyncHandler(async (req, res) => {
     }
   });
 });
-
-module.exports = {
-  register,
-  login,
-};
