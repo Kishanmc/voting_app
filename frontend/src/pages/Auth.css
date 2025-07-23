@@ -42,3 +42,13 @@
   color: red;
   text-align: center;
 }
+.input-error {
+  border: 1px solid red;
+}
+
+.error-msg {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: -6px;
+  margin-bottom: 10px;
+}
