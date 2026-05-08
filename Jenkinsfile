@@ -149,22 +149,20 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                echo "Cleaning up..."
-                sh 'docker system prune -f || true'
-            }
-        }
-        success {
-            echo "Pipeline completed successfully!"
-            // Uncomment to send notifications
-            // slackSend(color: 'good', message: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
-        }
-        failure {
-            echo "Pipeline failed!"
-            // Uncomment to send notifications
-            // slackSend(color: 'danger', message: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}")
+    always {
+        script {
+            echo 'Cleaning up...'
+            sh 'docker system prune -f'
         }
     }
+
+    failure {
+        echo 'Pipeline failed!'
+    }
+
+    success {
+        echo 'Pipeline succeeded!'
+    }
+}
 }
 
