@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
-import API from '../api/api';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  voteCandidate,
+  fetchCandidates,
+  deleteCandidate // optional thunk
+} from '../redux/slices/candidateSlice';
 import './CandidateCard.css';
 
-const CandidateCard = ({ candidate, onVoteSuccess, hasVoted, isAdmin }) => {
-  const [loading, setLoading] = useState(false);
+const CandidateCard = ({ candidate, hasVoted, isAdmin }) => {
+  const dispatch = useDispatch();
+  const voteMessage = useSelector((state) => state.candidate.voteMessage);
+  const [loading, setLoading] = React.useState(false);
 
   const handleVote = async () => {
     setLoading(true);
     try {
-      const res = await API.post('/api/candidate/vote', {
-        candidateId: candidate.candidateId,
-      });
-      alert(res.data.message);
-      onVoteSuccess();
+      const res = await dispatch(voteCandidate(candidate.candidateId)).unwrap();
+      alert(res.message || voteMessage);
+      dispatch(fetchCandidates());
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to vote');
+      alert(err || 'Failed to vote');
     } finally {
       setLoading(false);
     }
@@ -23,11 +28,11 @@ const CandidateCard = ({ candidate, onVoteSuccess, hasVoted, isAdmin }) => {
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this candidate?')) return;
     try {
-      await API.delete(`/api/candidate/delete/${candidate.candidateId}`);
-      alert('Candidate deleted');
-      onVoteSuccess();
+      const res = await dispatch(deleteCandidate(candidate.candidateId)).unwrap();
+      alert(res.message || 'Candidate deleted');
+      dispatch(fetchCandidates());
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete');
+      alert(err || 'Failed to delete');
     }
   };
 
@@ -39,13 +44,13 @@ const CandidateCard = ({ candidate, onVoteSuccess, hasVoted, isAdmin }) => {
 
       {!isAdmin && (
         <button onClick={handleVote} disabled={loading || hasVoted}>
-          {hasVoted ? "Already Voted" : loading ? "Voting..." : "Vote"}
+          {hasVoted ? "✅ Already Voted" : loading ? "Voting..." : "🗳️ Vote"}
         </button>
       )}
 
       {isAdmin && (
         <button onClick={handleDelete} className="delete-button">
-          Delete
+          🗑️ Delete
         </button>
       )}
     </div>

@@ -1,12 +1,15 @@
 // src/pages/Vote.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { voteCandidate } from '../redux/slices/candidateSlice';
 import API from '../api/api';
 import './Vote.css';
 
 const Vote = () => {
   const { id } = useParams(); // candidateId or _id
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [candidate, setCandidate] = useState(null);
   const [message, setMessage] = useState('');
@@ -17,7 +20,7 @@ const Vote = () => {
     const fetchCandidate = async () => {
       try {
         const res = await API.get('/api/candidate/candidates');
-        const found = res.data.find(c => c._id === id || c.candidateId === id);
+        const found = res.data.candidates?.find(c => c._id === id || c.candidateId === id);
         if (found) {
           setCandidate(found);
         } else {
@@ -37,17 +40,15 @@ const Vote = () => {
     if (!candidate) return;
 
     try {
-      const res = await API.post('/api/candidate/vote', {
-        candidateId: candidate.candidateId,
-      });
-      setMessage(res.data.message || '✅ Vote submitted successfully!');
+      const resultAction = await dispatch(voteCandidate(candidate.candidateId)).unwrap();
+      setMessage(resultAction.message || '✅ Vote submitted successfully!');
       setVoted(true);
 
       setTimeout(() => {
         navigate('/candidates');
       }, 2000);
     } catch (err) {
-      setMessage(err.response?.data?.message || '❌ Failed to vote');
+      setMessage(err || '❌ Failed to vote');
     }
   };
 
